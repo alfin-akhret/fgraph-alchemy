@@ -10,49 +10,25 @@ app.config.from_object('config')
 sys.dont_write_bytecode = True
 
 # -----------------------------------------------------
-# Database configuration
+# Database initiation
 # -----------------------------------------------------
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-
-engine = create_engine(app.config['DATABASE_CONN'],
-                    convert_unicode=True)
-
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                        autoflush=False,
-                                        bind=engine))
-
-Base = declarative_base()
-Base.query = db_session.query_property()
-
-def init_db():
-    # import all models here
-    from models.User import User
-    
-    Base.metadata.create_all(bind=engine)
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
-
-# create db if not exist
-init_db()
+from models import db
+db.init_app(app)
+db.create_all(app=app)
 
 # ----------------------------------------------------
 # GraphQL configuration
 # ----------------------------------------------------
-'''
 from flask_graphql import GraphQLView
-from schema import User
+from schema.User import schema, User
 app.add_url_rule(
-    'graphql',
+    '/graphql',
     view_func=GraphQLView.as_view(
+        'graphql',
         schema=schema,
         graphiql=True
     )
 )
-'''
 
 # ----------------------------------------------------
 # Run the flask server
