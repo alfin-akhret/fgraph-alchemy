@@ -8,3 +8,7 @@ class User(db.Model):
     id              = Column(Integer, primary_key=True)
     username        = Column(String(140))
     password        = Column(String(140)) 
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
