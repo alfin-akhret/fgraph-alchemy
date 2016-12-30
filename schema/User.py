@@ -1,8 +1,8 @@
 # schema/User.py
 # User scheme
 import graphene
-from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from models import db
 from models.User import User as UserModel
 
 class User(SQLAlchemyObjectType):
@@ -33,16 +33,33 @@ class CreateUser(graphene.Mutation):
     def mutate(self, args, context, info):
         user = UserModel(username=args.get('username'),
                         password=args.get('password'))
-        user.create() 
+        db.session.add(user)
+        db.session.commit()
         ok = True
-        return CreateUser(user=user)
+        return CreateUser(user=user, ok=ok)
+
+class DeleteUser(graphene.Mutation):
+    class Input:
+        id = graphene.Int()
+
+    ok = graphene.Boolean()
+    user = graphene.Field(lambda: User)
+
+    def mutate(self, args, context, info):
+        user = db.session.query(UserModel).filter_by(id=args.get('id')).first()
+        db.session.delete(user)
+        db.session.commit()
+        
+        ok = True 
+        return DeleteUser(user=user, ok=ok)
 
 
-class CreateUserMutation(graphene.ObjectType):
+class UserMutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    delete_user = DeleteUser.Field()
 
 
-schema = graphene.Schema(mutation=CreateUserMutation,
+schema = graphene.Schema(mutation=UserMutation,
                         query=Query,
                         types=[User],
                         auto_camelcase=False)
