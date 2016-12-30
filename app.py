@@ -13,6 +13,7 @@ sys.dont_write_bytecode = True
 # Database initiation
 # -----------------------------------------------------
 from models import db
+from models.User import User
 db.init_app(app)
 db.create_all(app=app)
 
