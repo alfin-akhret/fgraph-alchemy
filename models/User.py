@@ -1,9 +1,9 @@
 # models/user.py
 # The user model
 from sqlalchemy import Column, Integer, String, DateTime
-from app import Base
+from models import db
 
-class User(Base):
+class User(db.Model):
     __tablename__   = 'user'
     id              = Column(Integer, primary_key=True)
     username        = Column(String(140))

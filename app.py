@@ -28,7 +28,7 @@ Base.query = db_session.query_property()
 
 def init_db():
     # import all models here
-    from models import User
+    from models.User import User
     
     Base.metadata.create_all(bind=engine)
 
@@ -40,7 +40,25 @@ def shutdown_session(exception=None):
 init_db()
 
 # ----------------------------------------------------
+# GraphQL configuration
+# ----------------------------------------------------
+'''
+from flask_graphql import GraphQLView
+from schema import User
+app.add_url_rule(
+    'graphql',
+    view_func=GraphQLView.as_view(
+        schema=schema,
+        graphiql=True
+    )
+)
+'''
+
+# ----------------------------------------------------
 # Run the flask server
 # ----------------------------------------------------
 if __name__ == '__main__':
-    app.run(host=app.config['HOST'], port=app.config['PORT'])
+    app.run(
+        host=app.config['HOST'],
+        port=app.config['PORT']
+    )
