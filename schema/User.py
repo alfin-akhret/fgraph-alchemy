@@ -8,12 +8,24 @@ from models.User import User as UserModel
 class User(SQLAlchemyObjectType):
     class Meta:
         model = UserModel
-        interfaces = (relay.Node, )
 
+class Query(graphene.ObjectType):
+    users = graphene.List(User)
+    user  = graphene.Field(User, id=graphene.Int())
+
+    def resolve_users(self, args, context, info):
+        query = User.get_query(context) # SQLAlchemy query
+        return query.all()
+
+    def resolve_user(self, args, context, info):
+        query = User.get_query(context)
+        return query.filter(UserModel.id==args['id']).first()
+    
+# Mutation
 class CreateUser(graphene.Mutation):
     class Input:
-        username = graphene.String(name='username')
-        password = graphene.String(name='password')
+        username = graphene.String()
+        password = graphene.String()
     
     ok = graphene.Boolean()
     user = graphene.Field(lambda: User)
@@ -29,11 +41,7 @@ class CreateUser(graphene.Mutation):
 class CreateUserMutation(graphene.ObjectType):
     create_user = CreateUser.Field()
 
-class Query(graphene.ObjectType):
-    node = relay.Node.Field()
-    users = SQLAlchemyConnectionField(User)
-    user = graphene.Field(User)
- 
+
 schema = graphene.Schema(mutation=CreateUserMutation,
                         query=Query,
                         types=[User],
