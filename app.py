@@ -21,7 +21,7 @@ db.create_all(app=app)
 # GraphQL configuration
 # ----------------------------------------------------
 from flask_graphql import GraphQLView
-from schema.User import schema, User
+from schema.schema import schema
 app.add_url_rule(
     '/graphql',
     view_func=GraphQLView.as_view(
