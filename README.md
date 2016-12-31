@@ -2,4 +2,4 @@
 
 my own version of Flask-Graphene-SQLAlchemy boilerplate
 
-on going development...
+my little project for 2017
